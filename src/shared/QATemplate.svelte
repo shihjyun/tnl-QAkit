@@ -9,6 +9,8 @@
 </style>
 
 <script>
+  import { QAFinalPage } from '../stores/QAStatusStore.js'
+  export let questNumber
   let explainStatus
   let userHasClickedAnswer = false
   const QASet = {
@@ -43,6 +45,11 @@
       userHasClickedAnswer = true
       explainStatus = 'explainWrong'
     }
+
+    // update
+    console.log(e.path)
+    document.getElementById('qa-no-' + (questNumber + 1)).style.display = 'block'
+    QAFinalPage.update(() => questNumber + 1)
   }
 </script>
 

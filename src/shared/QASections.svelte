@@ -14,7 +14,14 @@
   import { isMobile } from '../stores/DeviceDetectorStore.js'
   import { tweened } from 'svelte/motion'
   import { quintOut } from 'svelte/easing'
+  import { onMount } from 'svelte'
+  import { QAFinalPage } from '../stores/QAStatusStore.js'
   import QATemplate from './QATemplate.svelte'
+
+  //
+
+  let maxQuestion
+  $: console.log('testing', $QAFinalPage)
 
   // set tweened animation store
   const progress = tweened(0, {
@@ -49,14 +56,18 @@
 
   $: console.log(currentPage)
 
-  // function zone
+  onMount(() => {
+    // final page equal to the number of qa-container's children
+    maxQuestion = document.querySelectorAll('#qa-container > div').length
+  })
 
+  // function statement zone
   // the handler that click&touch down event & add event listener to qa-container
   function handleMovementDown(e) {
     const QAcontainer = document.getElementById('qa-container')
     mouseDown = true
     // prevent error message mouse event trigger when user click nested button
-    if (!e.touches) return
+    if (!e.touches && $isMobile) return
     movementDownY = $isMobile ? e.touches[0].clientY : e.clientY
     console.log('click down')
 
@@ -77,6 +88,8 @@
       newMovementY = -(currentPage - 1) * windowHeight + moveDiff
       progress.set(newMovementY + moveDiff, { duration: 0 }) // update the latest coordinate to progress store
     }
+
+    console.log(currentPage, $QAFinalPage)
   }
 
   // the handler of click&touch up event
@@ -160,7 +173,7 @@
 
   // the function check if the situation can scroll (the situation like if you move in the first page, you can't scroll on previous page)
   function isOnQAsectionsTopOrEnd() {
-    if ((moveDirection === 'up' && currentPage === 1) || (moveDirection === 'down' && currentPage === 5)) {
+    if ((moveDirection === 'up' && currentPage === 1) || (moveDirection === 'down' && currentPage === $QAFinalPage)) {
       return true
     } else {
       return false
@@ -176,10 +189,16 @@
   on:touchstart|stopPropagation|passive={handleMovementDown}
   on:wheel|stopPropagation|passive={handleScroll}
 >
-  {#each [1, 2, 3, 4] as QANumber}
-    <div class="qa-section bg-green-200 border border-b border-black" id={`qa-no-` + QANumber}>
-      <QATemplate />
+  {#each [1, 2, 3, 4] as QANumber, i}
+    <div
+      class="qa-section bg-green-200 border border-b border-black"
+      id={`qa-no-` + QANumber}
+      style="display: {i === 0 ? 'block' : 'none'}"
+    >
+      <QATemplate questNumber={i + 1} />
     </div>
   {/each}
-  <div class="qa-section bg-red-200 border border-b border-black" id="qa-end">end</div>
+  <div class="qa-section bg-red-200 border border-b border-black" id="qa-no-{maxQuestion}" style="display: none">
+    end
+  </div>
 </div>
