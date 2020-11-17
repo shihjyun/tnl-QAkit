@@ -1359,9 +1359,8 @@ var app = (function () {
       }
     }
 
-    function cubicOut(t) {
-        const f = t - 1.0;
-        return f * f * f + 1.0;
+    function quintOut(t) {
+        return --t * t * t * t * t + 1;
     }
 
     function is_date(obj) {
@@ -1760,11 +1759,11 @@ var app = (function () {
 
     function get_each_context$1(ctx, list, i) {
     	const child_ctx = ctx.slice();
-    	child_ctx[19] = list[i];
+    	child_ctx[22] = list[i];
     	return child_ctx;
     }
 
-    // (128:2) {#each [1, 2, 3, 4] as QANumber}
+    // (179:2) {#each [1, 2, 3, 4] as QANumber}
     function create_each_block$1(ctx) {
     	let div;
     	let qatemplate;
@@ -1777,8 +1776,8 @@ var app = (function () {
     			div = element("div");
     			create_component(qatemplate.$$.fragment);
     			attr_dev(div, "class", "qa-section bg-green-200 border border-b border-black svelte-nlf5rm");
-    			attr_dev(div, "id", div_id_value = `qa-no-` + /*QANumber*/ ctx[19]);
-    			add_location(div, file$3, 128, 4, 3574);
+    			attr_dev(div, "id", div_id_value = `qa-no-` + /*QANumber*/ ctx[22]);
+    			add_location(div, file$3, 179, 4, 6165);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -1804,7 +1803,7 @@ var app = (function () {
     		block,
     		id: create_each_block$1.name,
     		type: "each",
-    		source: "(128:2) {#each [1, 2, 3, 4] as QANumber}",
+    		source: "(179:2) {#each [1, 2, 3, 4] as QANumber}",
     		ctx
     	});
 
@@ -1840,10 +1839,10 @@ var app = (function () {
     			div0.textContent = "end";
     			attr_dev(div0, "class", "qa-section bg-red-200 border border-b border-black svelte-nlf5rm");
     			attr_dev(div0, "id", "qa-end");
-    			add_location(div0, file$3, 132, 2, 3710);
+    			add_location(div0, file$3, 183, 2, 6301);
     			attr_dev(div1, "class", " svelte-nlf5rm");
     			attr_dev(div1, "id", "qa-container");
-    			add_location(div1, file$3, 120, 0, 3348);
+    			add_location(div1, file$3, 170, 0, 5889);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -1863,7 +1862,8 @@ var app = (function () {
     				dispose = [
     					action_destroyer(cssVariables_action = cssVariables.call(null, div1, { transleteY: /*transleteY*/ ctx[0] })),
     					listen_dev(div1, "mousedown", stop_propagation(/*handleMovementDown*/ ctx[2]), false, false, true),
-    					listen_dev(div1, "touchstart", stop_propagation(/*handleMovementDown*/ ctx[2]), { passive: true }, false, true)
+    					listen_dev(div1, "touchstart", stop_propagation(/*handleMovementDown*/ ctx[2]), { passive: true }, false, true),
+    					listen_dev(div1, "wheel", stop_propagation(/*handleScroll*/ ctx[3]), { passive: true }, false, true)
     				];
 
     				mounted = true;
@@ -1909,52 +1909,45 @@ var app = (function () {
     	return block;
     }
 
+    const pageChangeThreshold = 0.03;
+
     function instance$4($$self, $$props, $$invalidate) {
     	let $progress;
     	let $isMobile;
     	validate_store(isMobile, "isMobile");
-    	component_subscribe($$self, isMobile, $$value => $$invalidate(14, $isMobile = $$value));
+    	component_subscribe($$self, isMobile, $$value => $$invalidate(15, $isMobile = $$value));
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("QASections", slots, []);
-    	let isOnQAsectionsTopOrEnd = true;
-
-    	// tween animation setting
-    	const progress = tweened(0, { duration: 400, easing: cubicOut });
-
+    	const progress = tweened(0, { duration: 800, easing: quintOut });
     	validate_store(progress, "progress");
-    	component_subscribe($$self, progress, value => $$invalidate(13, $progress = value));
+    	component_subscribe($$self, progress, value => $$invalidate(14, $progress = value));
 
-    	function moveToNextPage() {
-    		// 1. moveDiff > (height of each page) * 0.3 => transition to next page
-    		// 2. there's also need to detect scrolling/touching direction.
-    		if (moveDirection === "down") {
-    			progressSettingValue = -windowHeight - moveDiff;
-    			$$invalidate(4, currentState += 1);
-    		} else {
-    			progressSettingValue = windowHeight - moveDiff;
-    			$$invalidate(4, currentState -= 1);
-    		}
+    	// click&touch movement handler initial setting variables
+    	let currentPage = 1; // the initail page when enter QA sections
 
-    		progress.set(0, { duration: 0 });
-    		progress.set(progressSettingValue);
-    	}
+    	let mouseDown = false; // true if user mousedown
+    	let isMoving = false; // true if user click and move their mouse
+    	let windowHeight = window.innerHeight; // screen height
 
-    	// movement handler initial setting variables
-    	let currentState = 1;
+    	let movementDownY = 0, moveY = 0, moveDiff = 0, newMovementY = 0; // the y-coordinate when user click down
+    	// the y-coordinate when user move
+    	// the distance that user move (movementDownY - moveY)
+    	// the y-coordinate after user click up
 
-    	let mouseDown = false;
-    	let isMoving = false;
-    	let windowHeight = window.innerHeight;
+    	// scroll-like movement initial setting variables
+    	let scrollingNow = false; // is wheel event fire now?
 
-    	let movementDownY = 0,
-    		moveY = 0,
-    		moveDiff = 0,
-    		newMovementY = 0,
-    		progressSettingValue = 0;
+    	let userCanScroll = false; // can user scroll on the start&end page?
 
+    	// function zone
+    	// the handler that click&touch down event & add event listener to qa-container
     	function handleMovementDown(e) {
     		const QAcontainer = document.getElementById("qa-container");
     		mouseDown = true;
+
+    		// prevent error message mouse event trigger when user click nested button
+    		if (!e.touches) return;
+
     		movementDownY = $isMobile ? e.touches[0].clientY : e.clientY;
     		console.log("click down");
 
@@ -1966,16 +1959,20 @@ var app = (function () {
     		QAcontainer.addEventListener("touchend", handleMovementUp);
     	}
 
+    	// the handler of click&touch move event
     	function handleMove(e) {
     		e.stopPropagation();
 
     		if (mouseDown) {
     			isMoving = true;
     			moveY = $isMobile ? e.touches[0].clientY : e.clientY;
-    			$$invalidate(9, moveDiff = moveY - movementDownY);
+    			$$invalidate(9, moveDiff = (moveY - movementDownY) * 0.3); // moveDiff * 0.3 can prevent decrease distance that user move
+    			newMovementY = -(currentPage - 1) * windowHeight + moveDiff;
+    			progress.set(newMovementY + moveDiff, { duration: 0 }); // update the latest coordinate to progress store
     		}
     	}
 
+    	// the handler of click&touch up event
     	function handleMovementUp(e) {
     		e.stopPropagation();
     		const QAcontainer = document.getElementById("qa-container");
@@ -1986,28 +1983,89 @@ var app = (function () {
     		mouseDown = false;
     		moveY = 0;
     		movementDownY = 0;
-    		$$invalidate(10, newMovementY = transleteY);
 
-    		// remove event listener after move
+    		// mouseup action
+    		if (Math.abs(moveDiff) > windowHeight * pageChangeThreshold && !isOnQAsectionsTopOrEnd()) {
+    			moveToNextPage();
+    			$$invalidate(9, moveDiff = 0);
+    		} else {
+    			// improve user experience when scroll over the valid zone
+    			progress.set(newMovementY, { duration: 0 });
+
+    			progress.set(-(currentPage - 1) * windowHeight);
+    			newMovementY = -(currentPage - 1) * windowHeight;
+    			$$invalidate(9, moveDiff = 0);
+    		}
+
+    		// remove event listener after mouse up
     		QAcontainer.removeEventListener("mouseup", handleMovementUp);
 
     		QAcontainer.removeEventListener("mousemove", handleMove);
     		QAcontainer.removeEventListener("touchend", handleMovementUp);
     		QAcontainer.removeEventListener("touchmove", handleMove);
-    		console.log(moveDiff);
+    		console.log(currentPage);
+    		console.log("click up");
+    	}
 
-    		// mouseup action
-    		if (Math.abs(moveDiff) > windowHeight * 0.1 && !isOnQAsectionsTopOrEnd) {
-    			console.log("object");
-    			moveToNextPage();
-    			$$invalidate(9, moveDiff = 0);
+    	function moveToNextPage() {
+    		// 1. when moveDiff > (height of each page) * 0.3 => transition to next page
+    		// 2. also need to detect scrolling/touching direction.
+    		if (moveDirection === "down") {
+    			$$invalidate(4, currentPage += 1);
+    			progress.set(newMovementY, { duration: 0 });
+    			progress.set(-(currentPage - 1) * windowHeight);
+    			newMovementY = -(currentPage - 1) * windowHeight;
     		} else {
-    			progress.set(0, { duration: 0 });
-    			progress.set(-moveDiff);
-    			$$invalidate(9, moveDiff = 0);
+    			$$invalidate(4, currentPage -= 1);
+    			progress.set(newMovementY, { duration: 0 });
+    			progress.set(-(currentPage - 1) * windowHeight);
+    			newMovementY = -(currentPage - 1) * windowHeight;
+    		}
+    	}
+
+    	// scroll/wheel event handler setting
+    	function handleScroll(e) {
+    		$$invalidate(11, scrollingNow = true);
+
+    		if (e.deltaY > 0) {
+    			moveDirection = "down";
+    		} else {
+    			moveDirection = "up";
     		}
 
-    		console.log("click up");
+    		$$invalidate(12, userCanScroll = isOnQAsectionsTopOrEnd());
+    	}
+
+    	// the function let qa-container scroll to next page
+    	function scrollToNextPage() {
+    		if (moveDirection === "down") {
+    			$$invalidate(4, currentPage += 1);
+    			progress.set(newMovementY, { duration: 0 });
+    			progress.set(-(currentPage - 1) * windowHeight, { duration: 1000 });
+    			newMovementY = -(currentPage - 1) * windowHeight;
+    		} else if (moveDirection === "up") {
+    			$$invalidate(4, currentPage -= 1);
+    			progress.set(newMovementY, { duration: 0 });
+    			progress.set(-(currentPage - 1) * windowHeight, { duration: 1000 });
+    			newMovementY = -(currentPage - 1) * windowHeight;
+    		}
+
+    		// the timer is to prevent excution of continuous scrollToNextPage
+    		setTimeout(
+    			() => {
+    				$$invalidate(11, scrollingNow = false);
+    			},
+    			1400
+    		);
+    	}
+
+    	// the function check if the situation can scroll (the situation like if you move in the first page, you can't scroll on previous page)
+    	function isOnQAsectionsTopOrEnd() {
+    		if (moveDirection === "up" && currentPage === 1 || moveDirection === "down" && currentPage === 5) {
+    			return true;
+    		} else {
+    			return false;
+    		}
     	}
 
     	const writable_props = [];
@@ -2020,12 +2078,10 @@ var app = (function () {
     		cssVariables,
     		isMobile,
     		tweened,
-    		cubicOut,
+    		quintOut,
     		QATemplate,
-    		isOnQAsectionsTopOrEnd,
     		progress,
-    		moveToNextPage,
-    		currentState,
+    		currentPage,
     		mouseDown,
     		isMoving,
     		windowHeight,
@@ -2033,10 +2089,16 @@ var app = (function () {
     		moveY,
     		moveDiff,
     		newMovementY,
-    		progressSettingValue,
+    		pageChangeThreshold,
+    		scrollingNow,
+    		userCanScroll,
     		handleMovementDown,
     		handleMove,
     		handleMovementUp,
+    		moveToNextPage,
+    		handleScroll,
+    		scrollToNextPage,
+    		isOnQAsectionsTopOrEnd,
     		moveDirection,
     		transleteY,
     		$progress,
@@ -2044,17 +2106,17 @@ var app = (function () {
     	});
 
     	$$self.$inject_state = $$props => {
-    		if ("isOnQAsectionsTopOrEnd" in $$props) isOnQAsectionsTopOrEnd = $$props.isOnQAsectionsTopOrEnd;
-    		if ("currentState" in $$props) $$invalidate(4, currentState = $$props.currentState);
+    		if ("currentPage" in $$props) $$invalidate(4, currentPage = $$props.currentPage);
     		if ("mouseDown" in $$props) mouseDown = $$props.mouseDown;
     		if ("isMoving" in $$props) isMoving = $$props.isMoving;
     		if ("windowHeight" in $$props) windowHeight = $$props.windowHeight;
     		if ("movementDownY" in $$props) movementDownY = $$props.movementDownY;
     		if ("moveY" in $$props) moveY = $$props.moveY;
     		if ("moveDiff" in $$props) $$invalidate(9, moveDiff = $$props.moveDiff);
-    		if ("newMovementY" in $$props) $$invalidate(10, newMovementY = $$props.newMovementY);
-    		if ("progressSettingValue" in $$props) progressSettingValue = $$props.progressSettingValue;
-    		if ("moveDirection" in $$props) $$invalidate(12, moveDirection = $$props.moveDirection);
+    		if ("newMovementY" in $$props) newMovementY = $$props.newMovementY;
+    		if ("scrollingNow" in $$props) $$invalidate(11, scrollingNow = $$props.scrollingNow);
+    		if ("userCanScroll" in $$props) $$invalidate(12, userCanScroll = $$props.userCanScroll);
+    		if ("moveDirection" in $$props) moveDirection = $$props.moveDirection;
     		if ("transleteY" in $$props) $$invalidate(0, transleteY = $$props.transleteY);
     	};
 
@@ -2067,25 +2129,28 @@ var app = (function () {
 
     	$$self.$$.update = () => {
     		if ($$self.$$.dirty & /*moveDiff*/ 512) {
-    			 $$invalidate(12, moveDirection = moveDiff < 0 ? "down" : "up");
+    			// detect click&toych direction
+    			 moveDirection = moveDiff < 0 ? "down" : "up";
     		}
 
-    		if ($$self.$$.dirty & /*moveDirection, currentState*/ 4112) {
-    			 {
-    				if (moveDirection === "up" && currentState === 1 || moveDirection === "down" && currentState === 5) {
-    					isOnQAsectionsTopOrEnd = true;
-    				} else {
-    					isOnQAsectionsTopOrEnd = false;
-    				}
+    		if ($$self.$$.dirty & /*$progress*/ 16384) {
+    			// y-coordinate that qa-container need to translate (just like normal scroll effect)
+    			 $$invalidate(0, transleteY = $progress);
+    		}
+
+    		if ($$self.$$.dirty & /*scrollingNow, userCanScroll*/ 6144) {
+    			// reactive expression to fire scrollToNextPage effect
+    			 if (scrollingNow && !userCanScroll) {
+    				scrollToNextPage();
     			}
     		}
 
-    		if ($$self.$$.dirty & /*newMovementY, moveDiff, $progress*/ 9728) {
-    			 $$invalidate(0, transleteY = newMovementY + moveDiff + $progress);
+    		if ($$self.$$.dirty & /*currentPage*/ 16) {
+    			 console.log(currentPage);
     		}
     	};
 
-    	return [transleteY, progress, handleMovementDown];
+    	return [transleteY, progress, handleMovementDown, handleScroll];
     }
 
     class QASections extends SvelteComponentDev {
