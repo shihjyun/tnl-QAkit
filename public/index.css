@@ -722,6 +722,14 @@ h2 {
 
 /* generally components setting */
 
+.answer-correct {
+  background-color: #21d190;
+}
+
+.answer-wrong {
+  background-color: #f53844;
+}
+
 /* hover setting */
 
 .hover-opacity:hover {
