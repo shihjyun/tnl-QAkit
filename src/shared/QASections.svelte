@@ -5,23 +5,19 @@
   }
   .qa-section {
     width: 100%;
-    height: 100vh;
   }
 </style>
 
 <script>
-  import { cssVariables } from '../utils/helper.js'
+  import { cssVariables, getAllSectionsHeight } from '../utils/helper.js'
   import { isMobile } from '../stores/DeviceDetectorStore.js'
   import { tweened } from 'svelte/motion'
   import { quintOut } from 'svelte/easing'
   import { onMount } from 'svelte'
-  import { QAFinalPage } from '../stores/QAStatusStore.js'
+  import { QAFinalPage, QASectionsHeight, QAProgress } from '../stores/QAStatusStore.js'
   import QATemplate from './QATemplate.svelte'
 
-  //
-
   let maxQuestion
-  $: console.log('testing', $QAFinalPage)
 
   // set tweened animation store
   const progress = tweened(0, {
@@ -37,28 +33,31 @@
   let movementDownY = 0, // the y-coordinate when user click down
     moveY = 0, // the y-coordinate when user move
     moveDiff = 0, // the distance that user move (movementDownY - moveY)
-    newMovementY = 0 // the y-coordinate after user click up
-  const pageChangeThreshold = 0.03
+    newMovementY = 0, // the y-coordinate after user click up
+    overflowHeight = 0,
+    moveOverflowDiff = 0,
+    scrollOverflowTick = 0,
+    clickUpMovementY = newMovementY
+  const pageChangeThreshold = 0.1
+
+  // update QAsectionHeight initially
+  QASectionsHeight.update(() => windowHeight)
 
   // detect click&toych direction
-  $: moveDirection = moveDiff < 0 ? 'down' : 'up'
+  $: moveDirection = moveDiff <= 0 ? 'down' : 'up'
 
   // y-coordinate that qa-container need to translate (just like normal scroll effect)
   $: transleteY = $progress
 
   // scroll-like movement initial setting variables
-  let scrollingNow = false // is wheel event fire now?
-  let userCanScroll = false // can user scroll on the start&end page?
-  // reactive expression to fire scrollToNextPage effect
-  $: if (scrollingNow && !userCanScroll) {
-    scrollToNextPage()
-  }
-
-  $: console.log(currentPage)
+  let validToScroll = true // is wheel event fire now?
 
   onMount(() => {
     // final page equal to the number of qa-container's children
     maxQuestion = document.querySelectorAll('#qa-container > div').length
+
+    // get all QA sections' height
+    QASectionsHeight.update(() => getAllSectionsHeight())
   })
 
   // function statement zone
@@ -84,12 +83,13 @@
     if (mouseDown) {
       isMoving = true
       moveY = $isMobile ? e.touches[0].clientY : e.clientY
-      moveDiff = (moveY - movementDownY) * 0.3 // moveDiff * 0.3 can prevent decrease distance that user move
-      newMovementY = -(currentPage - 1) * windowHeight + moveDiff
-      progress.set(newMovementY + moveDiff, { duration: 0 }) // update the latest coordinate to progress store
-    }
+      moveDiff = (moveY - movementDownY) * 0.5 // moveDiff * 0.6 can prevent decrease distance that user move
 
-    console.log(currentPage, $QAFinalPage)
+      // check overflowHeight
+      updateOverflowInfo()
+      newMovementY = clickUpMovementY + moveDiff
+      progress.set(newMovementY, { duration: 0 }) // update the latest coordinate to progress store
+    }
   }
 
   // the handler of click&touch up event
@@ -103,16 +103,24 @@
     moveY = 0
     movementDownY = 0
 
-    // mouseup action
-    if (Math.abs(moveDiff) > windowHeight * pageChangeThreshold && !isOnQAsectionsTopOrEnd()) {
-      moveToNextPage()
+    // detect if there's a overflow height section
+    if (checkOverflowSection()) {
+      clickUpMovementY = newMovementY
+      progress.set(newMovementY, { duration: 0 })
       moveDiff = 0
     } else {
-      // improve user experience when scroll over the valid zone
-      progress.set(newMovementY, { duration: 0 })
-      progress.set(-(currentPage - 1) * windowHeight)
-      newMovementY = -(currentPage - 1) * windowHeight
-      moveDiff = 0
+      // if not, use normal scroll mode
+      if (Math.abs(moveDiff) > windowHeight * pageChangeThreshold && !isOnQAsectionsTopOrEnd()) {
+        moveToNextPage()
+        moveDiff = 0
+      } else {
+        // improve user experience when scroll over the valid zone
+        progress.set(newMovementY, { duration: 0 })
+        progress.set(-totalSectionsHeight(0, currentPage - 1))
+        newMovementY = -totalSectionsHeight(0, currentPage - 1)
+        clickUpMovementY = newMovementY
+        moveDiff = 0
+      }
     }
 
     // remove event listener after mouse up
@@ -131,25 +139,42 @@
     if (moveDirection === 'down') {
       currentPage += 1
       progress.set(newMovementY, { duration: 0 })
-      progress.set(-(currentPage - 1) * windowHeight)
-      newMovementY = -(currentPage - 1) * windowHeight
+      progress.set(-totalSectionsHeight(0, currentPage - 1))
+      newMovementY = -totalSectionsHeight(0, currentPage - 1)
+      // prevent user need to scroll & touch, so here need to re-locate clickUpMovementY
+      clickUpMovementY = newMovementY
     } else {
       currentPage -= 1
       progress.set(newMovementY, { duration: 0 })
-      progress.set(-(currentPage - 1) * windowHeight)
-      newMovementY = -(currentPage - 1) * windowHeight
+      progress.set(-totalSectionsHeight(0, currentPage - 1))
+      newMovementY = -totalSectionsHeight(0, currentPage - 1)
+      // prevent user need to scroll & touch, so here need to re-locate clickUpMovementY
+      clickUpMovementY = newMovementY
     }
   }
 
   // scroll/wheel event handler setting
   function handleScroll(e) {
-    scrollingNow = true
+    updateOverflowInfo()
+
     if (e.deltaY > 0) {
       moveDirection = 'down'
     } else {
       moveDirection = 'up'
     }
-    userCanScroll = isOnQAsectionsTopOrEnd()
+
+    console.log('scroll', moveOverflowDiff, overflowHeight)
+    console.log(checkScrollOverflowSection())
+    if (checkScrollOverflowSection() === true && validToScroll) {
+      clickUpMovementY = newMovementY + (moveDirection == 'down' ? -30 : 30)
+      newMovementY = newMovementY + (moveDirection == 'down' ? -30 : 30)
+      progress.set(newMovementY, { duration: 100 })
+    } else if (checkScrollOverflowSection() === false && validToScroll) {
+      validToScroll = false
+      scrollToNextPage()
+    } else if (checkScrollOverflowSection() === 'static') {
+      // do nothing
+    }
   }
 
   // the function let qa-container scroll to next page
@@ -157,18 +182,26 @@
     if (moveDirection === 'down') {
       currentPage += 1
       progress.set(newMovementY, { duration: 0 })
-      progress.set(-(currentPage - 1) * windowHeight, { duration: 1000 })
-      newMovementY = -(currentPage - 1) * windowHeight
+      progress.set(-totalSectionsHeight(0, currentPage - 1), { duration: 1000 })
+      newMovementY = -totalSectionsHeight(0, currentPage - 1)
+      clickUpMovementY = newMovementY
+
+      // the timer is to prevent excution of continuous scrollToNextPage
+      setTimeout(() => {
+        validToScroll = true
+      }, 1300)
     } else if (moveDirection === 'up') {
       currentPage -= 1
       progress.set(newMovementY, { duration: 0 })
-      progress.set(-(currentPage - 1) * windowHeight, { duration: 1000 })
-      newMovementY = -(currentPage - 1) * windowHeight
+      progress.set(-totalSectionsHeight(0, currentPage - 1), { duration: 1000 })
+      newMovementY = -totalSectionsHeight(0, currentPage - 1)
+      clickUpMovementY = newMovementY
+
+      // the timer is to prevent excution of continuous scrollToNextPage
+      setTimeout(() => {
+        validToScroll = true
+      }, 1300)
     }
-    // the timer is to prevent excution of continuous scrollToNextPage
-    setTimeout(() => {
-      scrollingNow = false
-    }, 1400)
   }
 
   // the function check if the situation can scroll (the situation like if you move in the first page, you can't scroll on previous page)
@@ -178,6 +211,70 @@
     } else {
       return false
     }
+  }
+
+  //check overflow explain content
+  function checkOverflowSection() {
+    // crazy logic code ...
+    if (moveOverflowDiff < overflowHeight && moveDirection === 'down') {
+      return !isOnQAsectionsTopOrEnd()
+    } else if (moveOverflowDiff > overflowHeight && moveDirection === 'down') {
+      return false
+    } else if (moveOverflowDiff < overflowHeight && moveDirection === 'up') {
+      if (newMovementY >= 0 && currentPage === 1) {
+        return false
+      } else if (newMovementY >= 0 && currentPage !== 1) {
+        return true
+      } else if (newMovementY > -$QASectionsHeight[currentPage - 1] && currentPage === 1) {
+        return true
+      } else if (newMovementY > -totalSectionsHeight(0, currentPage - 1) && currentPage !== 1) {
+        return false
+      } else if (newMovementY < -totalSectionsHeight(0, currentPage - 1) && currentPage !== 1) {
+        return true
+      }
+    } else if (moveOverflowDiff > overflowHeight && moveDirection === 'up') {
+      return !isOnQAsectionsTopOrEnd()
+    }
+  }
+
+  // scroll overflow checker
+  function checkScrollOverflowSection() {
+    // crazy logic code ...
+    if (currentPage === 1 && moveDirection === 'up') {
+      if (newMovementY >= 0) {
+        return 'static'
+      } else if (moveOverflowDiff < overflowHeight) {
+        return true
+      } else if (moveOverflowDiff > overflowHeight) {
+        return false
+      }
+    } else if (moveDirection === 'down' && currentPage < $QAProgress) {
+      if (moveOverflowDiff === overflowHeight) {
+        return false
+      } else if (moveOverflowDiff < overflowHeight) {
+        return true
+      } else if (moveOverflowDiff > overflowHeight) {
+        return false
+      }
+    } else if (currentPage !== 1 && moveDirection === 'up') {
+      if (newMovementY < -totalSectionsHeight(0, currentPage - 1)) {
+        return true
+      } else if (newMovementY >= -totalSectionsHeight(0, currentPage - 1)) {
+        return false
+      }
+    }
+  }
+
+  // get selected section height
+  function totalSectionsHeight(start, end) {
+    const totalHeight = $QASectionsHeight.slice(start, end).reduce((a, b) => a + b, 0)
+    return totalHeight
+  }
+
+  // update overflow value
+  function updateOverflowInfo() {
+    overflowHeight = Math.abs(totalSectionsHeight(currentPage - 1, currentPage)) - windowHeight
+    moveOverflowDiff = Math.abs(newMovementY) - Math.abs(totalSectionsHeight(0, currentPage - 1))
   }
 </script>
 
@@ -193,12 +290,16 @@
     <div
       class="qa-section bg-green-200 border border-b border-black"
       id={`qa-no-` + QANumber}
-      style="display: {i === 0 ? 'block' : 'none'}"
+      style="display: {i === 0 ? 'block' : 'none'}; height: {windowHeight}px;"
     >
       <QATemplate questNumber={i + 1} />
     </div>
   {/each}
-  <div class="qa-section bg-red-200 border border-b border-black" id="qa-no-{maxQuestion}" style="display: none">
+  <div
+    class="qa-section bg-red-200 border border-b border-black"
+    id="qa-no-{maxQuestion}"
+    style="display: none; height: {windowHeight}px;"
+  >
     end
   </div>
 </div>
