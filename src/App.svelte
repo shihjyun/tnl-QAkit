@@ -10,8 +10,6 @@
   import QAsections from './shared/QASections.svelte'
   import BasicParagraphs from './shared/BasicParagraphs.svelte'
   import ArticleList from './shared/ArticleList.svelte'
-  import Footer from './shared/Footer.svelte'
-  import TeamCreatorList from './shared/TeamCreatorList.svelte'
   import { QAStatus } from './stores/QAStatusStore.js'
 
   function handleClick() {
@@ -31,7 +29,7 @@
 <main>
   <article class="main-grid-template">
     <section class="container-width mx-auto grid-full-cols">
-      <BasicParagraphs />
+      <BasicParagraphs sectionName="intro" />
     </section>
     <section class="container-width mx-auto grid-full-cols">
       <button on:click={handleClick} class="block border border-black mx-auto mb-6">開始作答</button>
@@ -48,9 +46,4 @@
       </section>
     {/if}
   </article>
-  {#if false}
-    <TeamCreatorList />
-    <!-- footer -->
-    <Footer />
-  {/if}
 </main>

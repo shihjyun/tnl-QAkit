@@ -22,7 +22,6 @@ function changeCardSectionHeight(questNumber) {
   const section = document.getElementById('qa-no-' + questNumber)
   const newSectionHeight = document.querySelector('#qa-no-' + questNumber + ' > div').getBoundingClientRect().height + 'px'
   const originalSectionHeight = section.style.height
-  console.log('cool',newSectionHeight, originalSectionHeight);
 
   if (+newSectionHeight.replace('px', '') > +originalSectionHeight.replace('px', '')) {
     section.style.height = newSectionHeight

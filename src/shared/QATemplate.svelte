@@ -1,12 +1,4 @@
 <style>
-  .QA-wrapper {
-    max-width: 560px;
-  }
-
-  .answer-normal {
-    background-color: none;
-  }
-
   .noselect {
     -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
@@ -19,44 +11,71 @@
 </style>
 
 <script>
-  import { QAFinalPage, QASectionsHeight, QAProgress } from '../stores/QAStatusStore.js'
+  import {
+    QAFinalPage,
+    QASectionsHeight,
+    QAProgress,
+    RightAnswerCalc,
+    QAProgressArray,
+  } from '../stores/QAStatusStore.js'
   import { changeCardSectionHeight, getAllSectionsHeight } from '../utils/helper.js'
+  import AnswerMessage from './AnswerMessage.svelte'
+  import AnswerHeader from './AnswerHeader.svelte'
+  import ContentDataStore from '../stores/ContentDataStore.js'
 
   export let questNumber
+  export let maxQuestion
 
-  let explainStatus
+  let explainStatus, QASet, Answers
+  let answerType = 'answer-normal'
   let userHasClickedAnswer = false
-  const QASet = {
-    question: '今天是星期幾？',
-    answer: [
-      { discription: '星期一', correct: 1 },
-      { discription: '星期二', correct: 0 },
-      { discription: '星期三', correct: 0 },
-    ],
-    explainCorrect: '沒錯！今天是星期一！',
-    explainWrong:
-      '從人們從事的行為是否具有風險判斷 依據先前對HIV傳染途徑的描述，並非只有特定身份的人才會感染愛滋，必須從人們從事的行為是否具有風險判斷 感染者年齡趨勢年輕化 台灣近年的感染者年齡趨勢為年輕化，以15-34歲為大宗 目前已發明「事前預防性投藥｜ PrEP 目前已發明「事前預防性投藥」｜以15-34歲為大宗 目前已發明「事前預防性投藥｜ PrEP 目前已發明「事前預防性投藥」｜ 必須從人們從事的行為是否具有風險判斷 感染者年齡趨勢年輕化 台灣近年的感染者年齡趨勢為年輕化，以15-34歲為大宗 目前已發明「事前預防性投藥｜ PrEP 目前已發明「事前預防性投藥」｜以15-34歲為大宗 目前已發明「事前預防性投藥｜ PrEP 目前已發明「事前預防性投藥」｜  ',
+
+  // check store has fetched content data from GCS
+  $: if ($ContentDataStore) {
+    QASet = $ContentDataStore['question_sets'][questNumber - 1]
   }
 
-  async function checkAnswer(e) {
+  function checkAnswer(e) {
     const selectedAnswer = e.target.dataset.correct
-    const Answers = e.target.parentElement.children
-    // handle right and wrong answer
-    for (let Answer of Answers) {
-      if (Answer.dataset.correct == 1) {
-        Answer.classList.add('answer-correct')
-      } else {
-        Answer.classList.add('answer-wrong')
-      }
-    }
+    Answers = e.target.parentElement.children
 
-    // handle explain zone
+    // if user's clicked answer is correct:
+    // 1. apply correct style to each answer
+    // 2. show corresponded explain text to user
+    // 3. add accumulated answer number to QA info
     if (selectedAnswer == 1) {
       userHasClickedAnswer = true
-      explainStatus = 'explainCorrect'
+      explainStatus = 'explain_correct'
+      e.target.classList.add('answer-correct')
+      RightAnswerCalc.update(() => $RightAnswerCalc + 1)
+      // update progress array
+      QAProgressArray.update((currentData) => {
+        let tmpArray = currentData
+        tmpArray[questNumber - 1].status = 'correct'
+        return tmpArray
+      })
     } else {
+      e.target.classList.add('answer-wrong')
       userHasClickedAnswer = true
-      explainStatus = 'explainWrong'
+      explainStatus = 'explain_wrong'
+      // update progress array
+      QAProgressArray.update((currentData) => {
+        let tmpArray = currentData
+        tmpArray[questNumber - 1].status = 'wrong'
+        return tmpArray
+      })
+    }
+
+    // handle each answer style
+    for (let i = 0; i < Answers.length; i++) {
+      if (Answers[i].dataset.correct == 1) {
+        Answers[i].classList.remove('answer-hover')
+        Answers[i].classList.remove('answer-normal')
+        Answers[i].classList.add('answer-correct')
+      } else {
+        Answers[i].style.opacity = 0.3
+        Answers[i].classList.remove('answer-hover')
+      }
     }
 
     // unlock next question card
@@ -72,23 +91,39 @@
     // update question progress
     QAProgress.update(() => questNumber + 1)
   }
+
+  // remove event listener when user clicked
+  $: if (userHasClickedAnswer) {
+    for (let i = 0; i < Answers.length; i++) {
+      Answers[i].removeEventListener('click', checkAnswer)
+    }
+  }
 </script>
 
-<div class="QA-wrapper mx-auto py-10">
-  <div class="w-full border border-gray-100 shadow">
-    <div class="noselect text-center py-5">問題：{QASet.question}</div>
-    <div class="flex justify-around">
-      {#each QASet.answer as { discription, correct, i }}
-        <span
-          class="border border-gray-200 py-3 px-3 mb-3 cursor-pointer"
-          on:click|stopPropagation={checkAnswer}
-          data-correct={correct}
-          answer-index={i}
-        >{discription}</span>
-      {/each}
+{#if $ContentDataStore}
+  <div class="QA-wrapper rounded-2xl border-4 border-black mx-auto">
+    <div class="w-full">
+      <AnswerHeader {questNumber} {maxQuestion} />
+      <div class="noselect QA-question-font py-2 px-3 mt-2">{QASet.question}</div>
+      <div class="mt-8">
+        {#each QASet.answer as { discription, correct, i }}
+          <div
+            class="{answerType} rounded-2xl py-3 px-3 mb-3 cursor-pointer mx-3 answer-hover"
+            on:click={checkAnswer}
+            data-correct={correct}
+            answer-index={i}
+          >
+            {discription}
+          </div>
+        {/each}
+      </div>
+      {#if userHasClickedAnswer}
+        <AnswerMessage {explainStatus} />
+        <div class="noselect text-left text-base border-b-2 border-black pt-6 pb-6 mx-3">
+          {@html QASet[explainStatus]}
+        </div>
+        <div class="text-center text-xs my-2">下一題</div>
+      {/if}
     </div>
-    {#if userHasClickedAnswer}
-      <div class="noselect text-left text-4xl pt-6 pb-3 ">{QASet[explainStatus]}</div>
-    {/if}
   </div>
-</div>
+{/if}

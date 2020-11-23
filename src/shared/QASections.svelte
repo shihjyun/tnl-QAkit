@@ -14,10 +14,19 @@
   import { tweened } from 'svelte/motion'
   import { quintOut } from 'svelte/easing'
   import { onMount } from 'svelte'
-  import { QAFinalPage, QASectionsHeight, QAProgress } from '../stores/QAStatusStore.js'
-  import QATemplate from './QATemplate.svelte'
+  import {
+    QAFinalPage,
+    QASectionsHeight,
+    QAProgress,
+    RightAnswerCalc,
+    QAProgressArray,
+  } from '../stores/QAStatusStore.js'
+  import BasicParagraphs from './BasicParagraphs.svelte'
+  import Footer from './Footer.svelte'
+  import TeamCreatorList from './TeamCreatorList.svelte'
+  import ContentDataStore from '../stores/ContentDataStore.js'
 
-  let maxQuestion
+  import QATemplate from './QATemplate.svelte'
 
   // set tweened animation store
   const progress = tweened(0, {
@@ -26,6 +35,7 @@
   })
 
   // click&touch movement handler initial setting variables
+  let maxQuestion = 0 // the total question user need to answer
   let currentPage = 1 // the initail page when enter QA sections
   let mouseDown = false // true if user mousedown
   let isMoving = false // true if user click and move their mouse
@@ -53,11 +63,21 @@
   let validToScroll = true // is wheel event fire now?
 
   onMount(() => {
-    // final page equal to the number of qa-container's children
-    maxQuestion = document.querySelectorAll('#qa-container > div').length
-
     // get all QA sections' height
     QASectionsHeight.update(() => getAllSectionsHeight())
+    setTimeout(() => {
+      maxQuestion = document.querySelectorAll('[id^="qa-no-"]').length - 1
+
+      QAProgressArray.update(() => {
+        let QAarray = $ContentDataStore.question_sets.map((d) => {
+          let obj = {}
+          obj['question_number'] = d.question_number
+          obj['status'] = 'unanswered'
+          return obj
+        })
+        return QAarray
+      })
+    }, 1000)
   })
 
   // function statement zone
@@ -278,28 +298,34 @@
   }
 </script>
 
-<div
-  class=""
-  use:cssVariables={{ transleteY }}
-  id="qa-container"
-  on:mousedown|stopPropagation={handleMovementDown}
-  on:touchstart|stopPropagation|passive={handleMovementDown}
-  on:wheel|stopPropagation|passive={handleScroll}
->
-  {#each [1, 2, 3, 4] as QANumber, i}
-    <div
-      class="qa-section bg-green-200 border border-b border-black"
-      id={`qa-no-` + QANumber}
-      style="display: {i === 0 ? 'block' : 'none'}; height: {windowHeight}px;"
-    >
-      <QATemplate questNumber={i + 1} />
-    </div>
-  {/each}
+{#if $ContentDataStore}
   <div
-    class="qa-section bg-red-200 border border-b border-black"
-    id="qa-no-{maxQuestion}"
-    style="display: none; height: {windowHeight}px;"
+    class=""
+    use:cssVariables={{ transleteY }}
+    id="qa-container"
+    on:mousedown|stopPropagation={handleMovementDown}
+    on:touchstart|stopPropagation|passive={handleMovementDown}
+    on:wheel|stopPropagation|passive={handleScroll}
   >
-    end
+    {#each $ContentDataStore.question_sets as { question_number }, i}
+      <div
+        class="qa-section bg-white"
+        id={`qa-no-` + question_number}
+        style="display: {i === 0 ? 'block' : 'none'}; height: {windowHeight}px;"
+      >
+        <div class="pt-6">
+          <QATemplate {maxQuestion} questNumber={i + 1} />
+        </div>
+      </div>
+    {/each}
+    <div
+      class="qa-section basic-p-container bg-white "
+      id="qa-no-{$ContentDataStore.question_sets.length + 1}"
+      style="display: none; height: {windowHeight}px;"
+    >
+      <p>你一共答對了 {$RightAnswerCalc} 題</p>
+      <BasicParagraphs sectionName="ending" />
+      <Footer />
+    </div>
   </div>
-</div>
+{/if}

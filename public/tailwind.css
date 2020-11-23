@@ -35,6 +35,46 @@ h2 {
   @apply w-full mx-auto pb-3;
 }
 
+/* QA section setting */
+
+.QA-wrapper {
+  max-width: 90vw;
+  -webkit-box-shadow: 0px 4px 12px rgba(130, 130, 130, 0.25);
+  box-shadow: 0px 4px 12px rgba(130, 130, 130, 0.25);
+}
+
+.QA-question-font {
+  @apply text-left font-semibold leading-9;
+  font-size: 1.75rem;
+}
+
+.QA-answer-font {
+  @apply text-left text-lg ;
+  font-size: 1.75rem;
+  line-height: 1.125rem;
+}
+
+.answer-normal {
+  border-width: 2px;
+  border-color: #e4e4e4;
+}
+
+.answer-hover:hover {
+  border-width: 2px;
+  border-color: #000000;
+}
+
+.answer-correct {
+  border-width: 2px;
+  border-color: #1ad71a;
+  -webkit-box-shadow: 0px 4px 12px rgba(130, 130, 130, 0.25);
+  box-shadow: 0px 4px 12px rgba(130, 130, 130, 0.25);
+}
+.answer-wrong {
+  background-color: #ffb6b6;
+  border-width: 2px;
+  border-color: #ff0000;
+}
 
 
 /* layout setting */
@@ -64,12 +104,7 @@ h2 {
 }
 
 /* generally components setting */
-.answer-correct {
-  background-color: #21d190;
-}
-.answer-wrong {
-  background-color: #f53844;
-}
+
 
 
 

@@ -1,9 +1,11 @@
 .container-width.svelte-gu3le{width:100%}
+div[class*='progress'].svelte-x28mq0{max-width:400px}
+div.svelte-8ubhnr.svelte-8ubhnr{border-bottom:2px solid rgba(228, 228, 228, 0.3)}div.svelte-8ubhnr>span.svelte-8ubhnr{letter-spacing:0.3rem}
 @media(min-width: 640px){}
 figcaption.svelte-18blbr1{margin:0 10px;font-size:12px;letter-spacing:0.05em;padding:0 0 3px 0;color:#777;line-height:1.5rem;max-width:650px;border-bottom:dashed 1px #ccc}@media(min-width: 640px){figcaption.svelte-18blbr1{font-size:16px;letter-spacing:0.05em;margin:0 auto;padding:0 7px 7px 7px;color:#777;line-height:1.5rem;max-width:650px;border-bottom:dashed 1px #ccc}}
 img.svelte-fpaa3l{width:220px}
 #qa-container.svelte-1x5sqzv{height:100vh;transform:translate3d(0, calc(var(--transleteY) * 1px), 0)}.qa-section.svelte-1x5sqzv{width:100%}
-.QA-wrapper.svelte-xbp9ls{max-width:560px}.noselect.svelte-xbp9ls{-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}
+.noselect.svelte-rcqz8q{-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}
 .spinner.svelte-1b7swrt.svelte-1b7swrt{-webkit-animation:svelte-1b7swrt-rotate 2s linear infinite;animation:svelte-1b7swrt-rotate 2s linear infinite;z-index:2;position:absolute;top:50%;left:50%;margin:-25px 0 0 -25px;width:50px;height:50px}.spinner.svelte-1b7swrt .path.svelte-1b7swrt{stroke:#cccccc;stroke-linecap:round;-webkit-animation:svelte-1b7swrt-dash 1.5s ease-in-out infinite;animation:svelte-1b7swrt-dash 1.5s ease-in-out infinite}@-webkit-keyframes svelte-1b7swrt-rotate{100%{-webkit-transform:rotate(360deg);transform:rotate(360deg)}}@keyframes svelte-1b7swrt-rotate{100%{-webkit-transform:rotate(360deg);transform:rotate(360deg)}}@-webkit-keyframes svelte-1b7swrt-dash{0%{stroke-dasharray:1, 150;stroke-dashoffset:0}50%{stroke-dasharray:90, 150;stroke-dashoffset:-35}100%{stroke-dasharray:90, 150;stroke-dashoffset:-124}}@keyframes svelte-1b7swrt-dash{0%{stroke-dasharray:1, 150;stroke-dashoffset:0}50%{stroke-dasharray:90, 150;stroke-dashoffset:-35}100%{stroke-dasharray:90, 150;stroke-dashoffset:-124}}
 .creator-grid.svelte-7pxywl{display:grid;grid-template-columns:1fr 1fr;grid-column-gap:20px;justify-items:center}
 
