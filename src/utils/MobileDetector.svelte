@@ -1,20 +1,20 @@
 <script>
-  import { isMobile } from '../stores/DeviceDetectorStore.js';
+  import { isMobile } from '../stores/DeviceDetectorStore.js'
 
-  export let minWidth = 500;
+  export let minWidth = 640
   // media query event handler
   if (matchMedia) {
-    const mq = window.matchMedia(`(min-width: ${minWidth}px)`);
-    mq.addListener(WidthSizeChange);
-    WidthSizeChange(mq);
+    const mq = window.matchMedia(`(min-width: ${minWidth}px)`)
+    mq.addListener(WidthSizeChange)
+    WidthSizeChange(mq)
   }
 
   // mobile detector when window's width size change
   function WidthSizeChange(mq) {
     if (mq.matches) {
-      isMobile.set(false);
+      isMobile.set(false)
     } else {
-      isMobile.set(true);
+      isMobile.set(true)
     }
   }
 </script>

@@ -755,6 +755,12 @@ h2 {
     padding-bottom: 1.5rem;
     max-width: 650px;
   }
+
+  /* QA section setting */
+
+  .QA-wrapper {
+    max-width: 70vw;
+  }
 }
 
 .container {

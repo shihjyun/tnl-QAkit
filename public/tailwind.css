@@ -125,6 +125,11 @@ h2 {
     @apply pb-6;
     max-width: 650px;
   }
+
+  /* QA section setting */
+  .QA-wrapper {
+    max-width: 70vw;
+  }
 }
 
 @tailwind components;

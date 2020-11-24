@@ -313,7 +313,7 @@
         id={`qa-no-` + question_number}
         style="display: {i === 0 ? 'block' : 'none'}; height: {windowHeight}px;"
       >
-        <div class="pt-6">
+        <div class="py-6 h-full">
           <QATemplate {maxQuestion} questNumber={i + 1} />
         </div>
       </div>
