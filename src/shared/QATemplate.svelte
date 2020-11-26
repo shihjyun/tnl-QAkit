@@ -28,6 +28,7 @@
   import AnswerMessage from './AnswerMessage.svelte'
   import AnswerHeader from './AnswerHeader.svelte'
   import ContentDataStore from '../stores/ContentDataStore.js'
+  import { isMobile } from '../stores/DeviceDetectorStore.js'
 
   export let questNumber
   export let maxQuestion
@@ -107,10 +108,10 @@
 </script>
 
 {#if $ContentDataStore}
-  <div class="QA-wrapper h-full rounded-2xl border-4 border-black mx-auto">
+  <div class="QA-wrapper relative h-full rounded-2xl border-4 border-black bg-white mx-auto pb-0 sm:pb-4">
     <div class="w-full">
       <AnswerHeader {questNumber} {maxQuestion} />
-      <div class="flex justify-between items-center QA-question-font py-2 mx-3 sm:mx-10 mt-2">
+      <div class="flex items-center QA-question-font py-2 mx-3 sm:mx-10 mt-2">
         <div class="hidden sm:block">
           <svg width="106" height="139" viewBox="0 0 19 20" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
@@ -135,12 +136,19 @@
       </div>
       {#if userHasClickedAnswer}
         <AnswerMessage {explainStatus} />
-        <div
-          class="noselect text-left text-base border-b-2 border-black sm:border-none pt-6 pb-6 mx-3 sm:mx-auto width-desk"
-        >
+        <div class="noselect text-left text-base sm:border-none pt-6 pb-10 sm:pb-6 mx-3 sm:mx-auto width-desk">
           {@html QASet[explainStatus]}
+          {#if QASet.explain_source}
+            <h5 class="pt-3 sm:pt-5 text-sm sm:text-base font-semibold">資料來源</h5>
+            <p class="sm:pt-1">{QASet.explain_source}</p>
+          {/if}
         </div>
-        <div class="text-center text-xs my-2">下一題</div>
+
+        {#if $isMobile}
+          <div class="absolte bottom-0 w-full rounded-b-lg text-center bg-black py-4">
+            <div class="text-white text-center">下一題</div>
+          </div>
+        {/if}
       {/if}
     </div>
   </div>

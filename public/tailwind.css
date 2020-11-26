@@ -6,7 +6,8 @@ body {
 }
 
 h1 {
-  @apply text-3xl font-semibold leading-normal tracking-wider text-gray-900;
+  @apply leading-10 font-semibold text-gray-900;
+  font-size: 1.75rem;
 }
 h2 {
   @apply text-2xl font-medium leading-normal tracking-widest;
@@ -15,15 +16,14 @@ h2 {
 
 /* basic paragraph container */
 .basic-p-container > p {
-  @apply text-justify whitespace-normal tracking-wide leading-7 text-base pb-6 px-4 mx-auto;
-  color: #4d4d4d;
-  max-width: 560px;
+  @apply text-justify whitespace-normal leading-6 text-base pb-6 px-4 mx-auto;
+  max-width: 700px;
 }
 
 .basic-p-container > h3 {
   @apply text-xl font-semibold leading-normal tracking-wider pt-10 pb-4 px-4 mx-auto;
   color: #4d4d4d;
-  max-width: 560px;
+  max-width: 700px;
 }
 
 .basic-p-container > .img-wrapper {
@@ -89,9 +89,8 @@ h2 {
 /* article list setting */
 .article-list-grid-template {
   @apply grid grid-flow-row justify-center w-full gap-4 mx-auto;
-  grid-template-columns: repeat(auto-fit, 240px);
-  max-width: 800px;
-  
+  grid-template-columns: repeat(auto-fit, 260px);
+  max-width: 900px;
 }
 .article-lists-img {
   @apply w-full transition duration-300 transform;
@@ -100,7 +99,7 @@ h2 {
   @apply pt-2 px-4 block text-sm;
 }
 .article-lists-h3 {
-  @apply pt-1 pb-4 px-4 tracking-normal font-normal text-base text-left;
+  @apply tracking-normal text-xl font-semibold text-left py-3;
 }
 
 /* generally components setting */
@@ -114,6 +113,11 @@ h2 {
 }
 
 @screen sm{
+  .article-list-grid-template {
+    @apply grid grid-flow-row justify-center w-full gap-4 mx-auto;
+    grid-template-columns: repeat(auto-fit, 300px);
+    max-width: 1000px;
+  }
   /* basic paragraph container */
   .basic-p-container > p {
     @apply text-lg leading-9;
@@ -128,7 +132,7 @@ h2 {
 
   /* QA section setting */
   .QA-wrapper {
-    max-width: 70vw;
+    max-width: 800px;
   }
 }
 

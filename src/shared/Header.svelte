@@ -5,12 +5,18 @@
 </style>
 
 <script>
-  import SocialBox from './SocialBox.svelte';
+  import SocialBox from './SocialBox.svelte'
+  import ContentDataStore from '../stores/ContentDataStore.js'
 
-  export let homePageUrl = 'https://www.thenewslens.com/';
-  export let shareUrl = '#';
-  export let tnlDomainPageId = '#';
-  export let socialIconColor = '#807F80';
+  export let homePageUrl = 'https://www.thenewslens.com/'
+  export let shareUrl = '#'
+  export let tnlDomainPageId = '#'
+  export let socialIconColor = '#807F80'
+
+  if ($ContentDataStore) {
+    shareUrl = $ContentDataStore.article_url
+    tnlDomainPageId = $ContentDataStore.tnl_page_id
+  }
 </script>
 
 <header class="flex justify-between bg-white py-2 px-2 shadow">

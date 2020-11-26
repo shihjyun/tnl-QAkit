@@ -6,6 +6,20 @@
   .qa-section {
     width: 100%;
   }
+
+  img {
+    width: 15rem;
+    height: 15rem;
+    object-position: 50% 0;
+    object-fit: cover;
+  }
+
+  @media (min-width: 640px) {
+    img {
+      width: 100%;
+      height: 100%;
+    }
+  }
 </style>
 
 <script>
@@ -24,6 +38,10 @@
   import BasicParagraphs from './BasicParagraphs.svelte'
   import Footer from './Footer.svelte'
   import TeamCreatorList from './TeamCreatorList.svelte'
+  import AnswerHeader from './AnswerHeader.svelte'
+  import FinalCardBackground from './FinalCardBackground.svelte'
+  import ArticleList from './ArticleList.svelte'
+  import SocialBoxInArticle from './SocialBoxInArticle.svelte'
   import ContentDataStore from '../stores/ContentDataStore.js'
 
   import QATemplate from './QATemplate.svelte'
@@ -77,7 +95,7 @@
         })
         return QAarray
       })
-    }, 1000)
+    }, 600)
   })
 
   // function statement zone
@@ -88,7 +106,6 @@
     // prevent error message mouse event trigger when user click nested button
     if (!e.touches && $isMobile) return
     movementDownY = $isMobile ? e.touches[0].clientY : e.clientY
-    console.log('click down')
 
     // add mousemove, mouseup event to `qa-container`
     QAcontainer.addEventListener('mousemove', handleMove)
@@ -148,9 +165,6 @@
     QAcontainer.removeEventListener('mousemove', handleMove)
     QAcontainer.removeEventListener('touchend', handleMovementUp)
     QAcontainer.removeEventListener('touchmove', handleMove)
-
-    console.log(currentPage)
-    console.log('click up')
   }
 
   function moveToNextPage() {
@@ -183,8 +197,6 @@
       moveDirection = 'up'
     }
 
-    console.log('scroll', moveOverflowDiff, overflowHeight)
-    console.log(checkScrollOverflowSection())
     if (checkScrollOverflowSection() === true && validToScroll) {
       clickUpMovementY = newMovementY + (moveDirection == 'down' ? -30 : 30)
       newMovementY = newMovementY + (moveDirection == 'down' ? -30 : 30)
@@ -237,7 +249,11 @@
   function checkOverflowSection() {
     // crazy logic code ...
     if (moveOverflowDiff < overflowHeight && moveDirection === 'down') {
-      return !isOnQAsectionsTopOrEnd()
+      if (currentPage === $QAFinalPage) {
+        return true
+      } else {
+        return !isOnQAsectionsTopOrEnd()
+      }
     } else if (moveOverflowDiff > overflowHeight && moveDirection === 'down') {
       return false
     } else if (moveOverflowDiff < overflowHeight && moveDirection === 'up') {
@@ -282,6 +298,8 @@
       } else if (newMovementY >= -totalSectionsHeight(0, currentPage - 1)) {
         return false
       }
+    } else if (moveOverflowDiff < overflowHeight && moveDirection === 'down' && currentPage === $QAFinalPage) {
+      return true
     }
   }
 
@@ -309,22 +327,74 @@
   >
     {#each $ContentDataStore.question_sets as { question_number }, i}
       <div
-        class="qa-section bg-white"
+        class="qa-section"
         id={`qa-no-` + question_number}
         style="display: {i === 0 ? 'block' : 'none'}; height: {windowHeight}px;"
       >
-        <div class="py-6 h-full">
+        <div class="py-6 h-auto sm:h-full">
           <QATemplate {maxQuestion} questNumber={i + 1} />
         </div>
       </div>
     {/each}
+
     <div
-      class="qa-section basic-p-container bg-white "
+      class="qa-section basic-p-container "
       id="qa-no-{$ContentDataStore.question_sets.length + 1}"
-      style="display: none; height: {windowHeight}px;"
+      style="display: none; height: auto;"
     >
-      <p>你一共答對了 {$RightAnswerCalc} 題</p>
-      <BasicParagraphs sectionName="ending" />
+      <div class="relative pt-16 h-auto">
+        {#if $isMobile}
+          <FinalCardBackground />
+        {/if}
+        <div class="QA-wrapper h-full rounded-2xl border-4 border-black bg-white mx-auto z-10">
+          <div class="w-full">
+            <AnswerHeader questNumber="0" finalPage={true} maxQuestion={null} />
+            <div class="bg-black text-white text-center py-4 sm:mx-10">共答對了 {$RightAnswerCalc} 題</div>
+            <img
+              class="mt-3 mb-6 mx-auto sm:px-10"
+              src="https://image2.thenewslens.com/2017/11/713gr851wegi4tefb41afh337w4obc.jpg"
+              alt=""
+            />
+          </div>
+        </div>
+      </div>
+      <div class="pt-6 bg-white pb-6">
+        <BasicParagraphs sectionName="ending" />
+        <SocialBoxInArticle shareUrl={$ContentDataStore.article_url} />
+      </div>
+      <div class="relative bg-white pb-16">
+        {#if $isMobile}
+          <div class="absolute overflow-hidden" style="max-height: 400px;">
+            <svg width="100vw" viewBox="0 0 320.5 420">
+              <path d="M320,0H102L0,102V420H320Z" style="fill:#ba1d26;fill-rule:evenodd" />
+              <path d="M216,419.5A104.49,104.49,0,0,1,320.5,315V419.5Z" style="fill:#ffba49" />
+            </svg>
+          </div>
+          <div class="absolute right-0" style="top: -77px;">
+            <svg width="76" height="77" viewBox="0 0 76 77" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0 77L76 -3.32207e-06L76 77L0 77Z" fill="#FDC637" />
+            </svg>
+          </div>
+        {:else}
+          <div class="absolute overflow-hidden" style="max-height: 380px; min-height: 320px;">
+            <svg width="100vw" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 420">
+              <path d="M1440,0H280L0,279V420H1440Z" style="fill:#3699ff;fill-rule:evenodd" />
+              <path d="M1160,420a280,280,0,0,1,280-280V420Z" style="fill:#ffc736" />/svg>
+            </svg>
+          </div>
+          <div class="absolute right-0" style="top: -136px;">
+            <svg width="135" height="136" viewBox="0 0 135 136" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0 136L135 -2.11598e-05L135 136L0 136Z" fill="#1D4ABA" />
+            </svg>
+          </div>
+        {/if}
+        <h2 class="relative text-center text-white text-3xl pt-12">推薦文章</h2>
+        <p class="relative text-center text-lg text-white font-normal pt-6 pb-2 px-6 mx-auto" style="max-width: 650px;">
+          {$ContentDataStore.read_more_intro}
+        </p>
+        <ArticleList projectName={$ContentDataStore.project_name} articleData={$ContentDataStore.read_more_articles} />
+        <SocialBoxInArticle shareUrl={$ContentDataStore.article_url} />
+      </div>
       <Footer />
     </div>
   </div>

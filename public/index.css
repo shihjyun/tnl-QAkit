@@ -555,12 +555,10 @@ body {
 
 h1 {
   font-weight: 600;
-  font-size: 1.875rem;
-  line-height: 2.25rem;
-  line-height: 1.5;
+  line-height: 2.5rem;
   --tw-text-opacity: 1;
   color: rgba(17, 24, 39, var(--tw-text-opacity));
-  letter-spacing: 0.05em;
+  font-size: 1.75rem;
 }
 
 h2 {
@@ -577,17 +575,15 @@ h2 {
 .basic-p-container > p {
   font-size: 1rem;
   line-height: 1.5rem;
-  line-height: 1.75rem;
+  line-height: 1.5rem;
   margin-left: auto;
   margin-right: auto;
   padding-left: 1rem;
   padding-right: 1rem;
   padding-bottom: 1.5rem;
   text-align: justify;
-  letter-spacing: 0.025em;
   white-space: normal;
-  color: #4d4d4d;
-  max-width: 560px;
+  max-width: 700px;
 }
 
 .basic-p-container > h3 {
@@ -603,7 +599,7 @@ h2 {
   padding-top: 2.5rem;
   letter-spacing: 0.05em;
   color: #4d4d4d;
-  max-width: 560px;
+  max-width: 700px;
 }
 
 .basic-p-container > .img-wrapper {
@@ -688,8 +684,8 @@ h2 {
   width: 100%;
   gap: 1rem;
   grid-auto-flow: row;
-  grid-template-columns: repeat(auto-fit, 240px);
-  max-width: 800px;
+  grid-template-columns: repeat(auto-fit, 260px);
+  max-width: 900px;
 }
 
 .article-lists-img {
@@ -718,13 +714,11 @@ h2 {
 }
 
 .article-lists-h3 {
-  font-weight: 400;
-  font-size: 1rem;
-  line-height: 1.5rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  padding-top: 0.25rem;
-  padding-bottom: 1rem;
+  font-weight: 600;
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
   text-align: left;
   letter-spacing: 0em;
 }
@@ -738,6 +732,18 @@ h2 {
 }
 
 @media (min-width: 640px){
+  .article-list-grid-template {
+    display: grid;
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    gap: 1rem;
+    grid-auto-flow: row;
+    grid-template-columns: repeat(auto-fit, 300px);
+    max-width: 1000px;
+  }
+
   /* basic paragraph container */
 
   .basic-p-container > p {
@@ -759,7 +765,7 @@ h2 {
   /* QA section setting */
 
   .QA-wrapper {
-    max-width: 70vw;
+    max-width: 800px;
   }
 }
 

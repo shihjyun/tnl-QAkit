@@ -34,9 +34,9 @@ function getAllSectionsHeight(){
   const sections = document.querySelectorAll('[id^="qa-no-"]')
   
   for (let i = 0; i < sections.length; i++) {
-    sectionHeightList.push(sections[i].style.height)
+    sectionHeightList.push(sections[i].getBoundingClientRect().height)
   }
-  return(sectionHeightList.map(d => +d.replace('px', '')))
+  return(sectionHeightList)
 }
 
 export {cssVariables, setCssVariables, changeCardSectionHeight, getAllSectionsHeight}
