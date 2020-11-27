@@ -32,16 +32,19 @@
     {#if $QAProgressArray}
       {#each $QAProgressArray as { question_number, status }}
         {#if +question_number == +questNumber}
-          <div class="flex justify-center items-center rounded-full h-6 w-6 mx-2 border-2 border-black">
+          <div
+            class="flex justify-center items-center rounded-full h-6 w-6 mx-2 border-2 border-black"
+            style="opacity: {status === 'wrong' ? 0.3 : 1}"
+          >
             <div
               class="rounded-full bg-black h-4 w-4"
-              style="background-color: {status === 'unanswered' ? '#000000' : progressColorChecker(status)}"
+              style="background-color: {status === 'unanswered' ? '#000000' : progressColorChecker(status)}; opacity: {status === 'wrong' ? 0.3 : 1}"
             />
           </div>
         {:else}
           <div
             class="rounded-full h-4 w-4 mx-2 border-2 border-black"
-            style="background-color: {progressColorChecker(status)}"
+            style="background-color: {progressColorChecker(status)}; opacity: {status === 'wrong' ? 0.3 : 1}"
           />
         {/if}
       {/each}

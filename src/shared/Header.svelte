@@ -9,9 +9,9 @@
   import ContentDataStore from '../stores/ContentDataStore.js'
 
   export let homePageUrl = 'https://www.thenewslens.com/'
-  export let shareUrl = '#'
-  export let tnlDomainPageId = '#'
   export let socialIconColor = '#807F80'
+  let shareUrl = '#'
+  let tnlDomainPageId = '#'
 
   if ($ContentDataStore) {
     shareUrl = $ContentDataStore.article_url

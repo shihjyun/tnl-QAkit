@@ -103,14 +103,19 @@ h2 {
 }
 
 /* generally components setting */
-
-
+.h-full-sp {
+  height: 100%;
+}
+.h-auto-sp {
+  height: auto
+}
 
 
 /* hover setting */
 .hover-opacity:hover {
   opacity: 0.5;
 }
+
 
 @screen sm{
   .article-list-grid-template {
@@ -138,3 +143,14 @@ h2 {
 
 @tailwind components;
 @tailwind utilities;
+@responsive {
+  .h-full-sp {
+    height: 100%;
+  }
+  .h-auto-sp {
+    height: auto
+  }
+  .tracking-widesttt {
+    letter-spacing: 0.2em;
+  }
+}

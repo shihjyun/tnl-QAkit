@@ -27,12 +27,15 @@
 
 <script>
   import ContentDataStore from '../stores/ContentDataStore.js'
+  import ThemeStore from '../stores/ThemeStore.js'
 
   let introData
+  let themeNum = '1'
 
   // check store has fetched content data from GCS
   $: if ($ContentDataStore) {
     introData = $ContentDataStore['intro']
+    themeNum = $ContentDataStore['theme']
   }
 
   function handleClick() {
@@ -49,19 +52,19 @@
     <div class="absolute left-0">
       <svg width="75vw" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 320"><path
           d="M80,0H0V320H240L80,160H240V87.84A80,80,0,0,1,160.38,160V0A80,80,0,0,1,240,72.16V0H80Zm0,0V160A80,80,0,0,1,80,0Zm0,160V320a80,80,0,0,1,0-160Z"
-          style="fill:#ba1d26;fill-rule:evenodd"
+          style="fill:{$ThemeStore[themeNum][1]};fill-rule:evenodd"
         /></svg>
     </div>
     <div class="absolute right-0">
       <svg width="75vw" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 320"><path
           d="M240,0H160V160H0L160,320V160h80Z"
-          style="fill:#1d4aba;fill-rule:evenodd"
+          style="fill:{$ThemeStore[themeNum][0]};fill-rule:evenodd"
         /></svg>
     </div>
     <div class="absolute">
       <svg width="100vw" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320"><path
           d="M49.39,6.09A80,80,0,0,1,80,0V160A80,80,0,0,1,49.39,6.09ZM240,240l80,80V240Z"
-          style="fill:#ffc736;fill-rule:evenodd"
+          style="fill:{$ThemeStore[themeNum][2]};fill-rule:evenodd"
         /></svg>
     </div>
     <div class="relative" style="width: 82.5%; height: 82.5%;">
@@ -85,6 +88,7 @@
   <button
     on:click={handleClick}
     class="block w-full rounded-lg border text-white text-xl tracking-widest bg-black mb-6 py-3"
+    style="background-color:{$ThemeStore[themeNum][0]};"
   >開始作答</button>
 </div>
 <div class="px-4 pb-5 mb-3 mx-4" id="intro-sp-line" />

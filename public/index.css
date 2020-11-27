@@ -725,6 +725,14 @@ h2 {
 
 /* generally components setting */
 
+.h-full-sp {
+  height: 100%;
+}
+
+.h-auto-sp {
+  height: auto
+}
+
 /* hover setting */
 
 .hover-opacity:hover {
@@ -31390,6 +31398,18 @@ h2 {
           animation: bounce 1s infinite;
 }
 
+.h-full-sp {
+  height: 100%;
+}
+
+.h-auto-sp {
+  height: auto
+}
+
+.tracking-widesttt {
+  letter-spacing: 0.2em;
+}
+
 @media (min-width: 640px) {
   .sm\:container {
     width: 100%;
@@ -61931,6 +61951,18 @@ h2 {
   .sm\:animate-bounce {
     -webkit-animation: bounce 1s infinite;
             animation: bounce 1s infinite;
+  }
+
+  .sm\:h-full-sp {
+    height: 100%;
+  }
+
+  .sm\:h-auto-sp {
+    height: auto
+  }
+
+  .sm\:tracking-widesttt {
+    letter-spacing: 0.2em;
   }
 }
 
@@ -92476,6 +92508,18 @@ h2 {
     -webkit-animation: bounce 1s infinite;
             animation: bounce 1s infinite;
   }
+
+  .md\:h-full-sp {
+    height: 100%;
+  }
+
+  .md\:h-auto-sp {
+    height: auto
+  }
+
+  .md\:tracking-widesttt {
+    letter-spacing: 0.2em;
+  }
 }
 
 @media (min-width: 1024px) {
@@ -123019,6 +123063,18 @@ h2 {
   .lg\:animate-bounce {
     -webkit-animation: bounce 1s infinite;
             animation: bounce 1s infinite;
+  }
+
+  .lg\:h-full-sp {
+    height: 100%;
+  }
+
+  .lg\:h-auto-sp {
+    height: auto
+  }
+
+  .lg\:tracking-widesttt {
+    letter-spacing: 0.2em;
   }
 }
 
@@ -153564,6 +153620,18 @@ h2 {
     -webkit-animation: bounce 1s infinite;
             animation: bounce 1s infinite;
   }
+
+  .xl\:h-full-sp {
+    height: 100%;
+  }
+
+  .xl\:h-auto-sp {
+    height: auto
+  }
+
+  .xl\:tracking-widesttt {
+    letter-spacing: 0.2em;
+  }
 }
 
 @media (min-width: 1536px) {
@@ -184107,5 +184175,17 @@ h2 {
   .\32xl\:animate-bounce {
     -webkit-animation: bounce 1s infinite;
             animation: bounce 1s infinite;
+  }
+
+  .\32xl\:h-full-sp {
+    height: 100%;
+  }
+
+  .\32xl\:h-auto-sp {
+    height: auto
+  }
+
+  .\32xl\:tracking-widesttt {
+    letter-spacing: 0.2em;
   }
 }
