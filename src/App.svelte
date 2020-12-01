@@ -18,6 +18,7 @@
   import ContentDataStore from './stores/ContentDataStore.js'
 
   let themeNum = '1'
+  let shareUrl, tnlDomainPageId
 
   $: if ($ContentDataStore) {
     themeNum = $ContentDataStore['theme']

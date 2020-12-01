@@ -1,13 +1,13 @@
 <script>
-  export let bgColor = 'black';
-  export let projectName = '';
-  export let copyRightColor = 'white';
-  export let homePageUrl = 'https://www.thenewslens.com/';
-  export let tnlLogoUrl = 'https://datastore.thenewslens.com/infographic/assets/tnl-logo/tnl-footer-dark-bg-logo.png';
+  export let bgColor = 'black'
+  export let projectName = ''
+  export let copyRightColor = 'white'
+  export let homePageUrl = 'https://www.thenewslens.com/'
+  export let tnlLogoUrl = 'https://datastore.thenewslens.com/infographic/assets/tnl-logo/tnl-footer-dark-bg-logo.png'
 </script>
 
 <footer>
-  <div class="text-center p-8 text-white font-light tracking-wide" style="background-color: {bgColor};">
+  <div class="text-center px-8 pt-8 pb-48 text-white font-light tracking-wide" style="background-color: {bgColor};">
     <a href={homePageUrl}>
       <figure class="mx-auto my-2">
         <img

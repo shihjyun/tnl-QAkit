@@ -21,6 +21,7 @@
 <script>
   import ContentDataStore from '../stores/ContentDataStore.js'
   import ThemeStore from '../stores/ThemeStore.js'
+  import CTAnimation from '../shared/CTAnimation.svelte'
 
   let introData
   let themeNum = '1'
@@ -103,11 +104,16 @@
             <p class="pt-4">{text}</p>
           {/each}
         </div>
-        <button
-          on:click={handleClick}
-          class="block w-64 rounded-lg border text-white text-xl tracking-widest mb-6 py-3 mx-auto shadow-sp"
-          style="background-color:{$ThemeStore[themeNum][0]};"
-        >開始作答</button>
+        <div class="grid grid-cols-5 w-full" style="transform: translateY(100px);">
+          <button
+            on:click={handleClick}
+            class="col-start-2 col-end-5 block w-64 rounded-lg border text-white text-xl tracking-widest m-auto py-3 mx-auto shadow-sp z-10"
+            style="background-color:{$ThemeStore[themeNum][0]};"
+          >開始作答</button>
+          <!-- <div class="col-start-5 col-end-6 relative h-full">
+            <CTAnimation />
+          </div> -->
+        </div>
       </div>
     </div>
   </div>

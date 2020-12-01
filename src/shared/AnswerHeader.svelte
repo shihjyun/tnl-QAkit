@@ -38,7 +38,7 @@
           >
             <div
               class="rounded-full bg-black h-4 w-4"
-              style="background-color: {status === 'unanswered' ? '#000000' : progressColorChecker(status)}; opacity: {status === 'wrong' ? 0.3 : 1}"
+              style="background-color: {status === 'unanswered' ? '#000000' : progressColorChecker(status)};"
             />
           </div>
         {:else}

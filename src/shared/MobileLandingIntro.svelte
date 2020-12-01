@@ -71,8 +71,8 @@
       <div class="absolute bg-black h-full w-full" id="intro-img-shadow" />
       <img
         class="absolute border-4 border-black h-full w-full"
-        src={introData.cover_image.url}
-        alt={introData.cover_image.discription}
+        src={introData.cover_image_mobile.url}
+        alt={introData.cover_image_mobile.discription}
         id="intro-img"
       />
     </div>

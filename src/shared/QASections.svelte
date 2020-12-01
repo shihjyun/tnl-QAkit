@@ -17,7 +17,7 @@
   import { cssVariables, getAllSectionsHeight } from '../utils/helper.js'
   import { isMobile } from '../stores/DeviceDetectorStore.js'
   import { tweened } from 'svelte/motion'
-  import { quintOut } from 'svelte/easing'
+  import { quintOut, linear } from 'svelte/easing'
   import { onMount } from 'svelte'
   import {
     QAFinalPage,
@@ -93,7 +93,7 @@
         })
         return QAarray
       })
-    }, 600)
+    }, 1000)
   })
 
   // function statement zone
@@ -201,7 +201,6 @@
 
     if (!scrollLimit) {
       updateOverflowInfo()
-      console.log(`x:${e.deltaX} y:${e.deltaY}`)
 
       if (e.deltaY > 0) {
         moveDirection = 'down'
@@ -211,13 +210,13 @@
 
       if (checkScrollOverflowSection() === true && validToScroll) {
         if (currentPage == $QAFinalPage) {
-          scrollSpeed = 71
+          scrollSpeed = 80
         } else {
-          scrollSpeed = 25
+          scrollSpeed = 30
         }
         clickUpMovementY = newMovementY + (moveDirection == 'down' ? -scrollSpeed : scrollSpeed)
         newMovementY = newMovementY + (moveDirection == 'down' ? -scrollSpeed : scrollSpeed)
-        progress.set(newMovementY, { duration: 100 })
+        progress.set(newMovementY, { duration: 200, easing: linear })
       } else if (checkScrollOverflowSection() === false && validToScroll) {
         validToScroll = false
         scrollToNextPage()
@@ -294,8 +293,6 @@
   // scroll overflow checker
   function checkScrollOverflowSection() {
     // crazy logic code ...
-    console.log(currentPage, moveDirection)
-    console.log('debug', moveOverflowDiff, overflowHeight)
     if (currentPage === 1 && moveDirection === 'up') {
       if (newMovementY >= 0) {
         return 'static'
@@ -368,7 +365,10 @@
           <div class="w-full">
             <AnswerHeader questNumber="0" finalPage={true} maxQuestion={null} />
             <div
-              class="bg-black text-xl sm:text-3xl tracking-widest sm:tracking-widesttt text-white text-center py-4 sm:mx-10"
+              class="gtm-track bg-black text-xl sm:text-3xl tracking-widest sm:tracking-widesttt text-white text-center py-4 sm:mx-10"
+              data-gtm-category={$ContentDataStore.project_name}
+              data-gtm-label=""
+              id="end-card"
             >
               共答對了{$RightAnswerCalc}題
             </div>
@@ -411,17 +411,23 @@
         <h2 class="relative text-center text-white text-3xl pt-12">推薦文章</h2>
         <ArticleList projectName={$ContentDataStore.project_name} articleData={$ContentDataStore.read_more_articles} />
         {#if $ContentDataStore.final_shared_text}
-          <div class="text-center font-bold text-xl sm:text-2xl mx-auto px-12 pb-3 sm:p-0" style="max-width: 500px">
-            {$ContentDataStore.final_shared_text}
+          <div
+            class="text-center font-bold text-lg sm:text-2xl mx-auto px-8 sm:px-12 pb-3 sm:p-0"
+            style="max-width: 530px"
+          >
+            {@html $ContentDataStore.final_shared_text}
           </div>
         {/if}
         <SocialBoxInArticle shareUrl={$ContentDataStore.article_url} />
       </div>
-      <div class="text-center pb-20 mx-6 bg-white" style="word-break: keep-all;">
+      <div class="text-center pb-20 px-6 bg-white" style="word-break: keep-all;">
         <div>製作團隊｜{$ContentDataStore.team}</div>
         <div class="pt-2">核稿編輯｜{$ContentDataStore.sub_editor}</div>
       </div>
-      <Footer />
+
+      <div style="transform: translateY(70px);">
+        <Footer />
+      </div>
     </div>
   </div>
 {/if}
