@@ -9,19 +9,25 @@
     "serve": "serve public -p 80",
     "dev": "concurrently \"rollup -c -w\" \"npm run watch:tailwind\""
   },
+  "bin": {
+    "upload-build-files-to-GCS": "./tnl-kit/buildFileUploader.js",
+    "upload-files-to-GCS": "./tnl-kit/fileUploader.js"
+  },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^14.0.0",
     "@rollup/plugin-node-resolve": "^8.0.0",
-    "autoprefixer": "^10.0.2",
+    "autoprefixer": "^10.1.0",
     "concurrently": "^5.3.0",
     "cross-env": "^7.0.2",
     "postcss-cli": "^8.1.0",
+    "prettier": "^2.1.2",
+    "prettier-plugin-svelte": "^1.4.0",
     "rollup": "^2.3.4",
     "rollup-plugin-livereload": "^2.0.0",
-    "rollup-plugin-svelte": "^6.0.0",
+    "rollup-plugin-svelte": "~6.1.1",
     "rollup-plugin-terser": "^7.0.0",
-    "svelte": "^3.0.0",
-    "tailwindcss": "^2.0.1"
+    "svelte": "^3.2.0",
+    "tailwindcss": "^2.0.2"
   },
   "dependencies": {
     "postcss": "^8.1.9",

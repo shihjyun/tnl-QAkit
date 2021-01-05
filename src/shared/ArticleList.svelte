@@ -2,7 +2,6 @@
 </style>
 
 <script>
-  import Spinner from './Spinner.svelte'
   export let projectName
   export let articleData
 </script>
@@ -10,7 +9,7 @@
 <div class="relative article-list-grid-template pb-10">
   {#await articleData}
     <div class="w-64 h-64">
-      <Spinner />
+      loading ... 
     </div>
   {:then articleData}
     {#each articleData.slice(0, 6) as { article_title, article_img_url, article_url }}
